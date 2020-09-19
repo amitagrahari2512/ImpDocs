@@ -1,0 +1,31 @@
+1 - Custom Plugin in Jenkins -  
+
+We need to create .hpi extension file, and then upload plugins.
+
+
+2 - Connect docker with windows
+
+Chnage this Deamon file
+
+{
+  "registry-mirrors": [],
+  "insecure-registries": [],
+  "debug": true,
+  "experimental": true,
+  "hosts": [
+    "tcp://0.0.0.0:2376",
+    "npipe://"
+  ]
+}
+
+3 - Windows Jenkins path
+
+C:\WINDOWS\system32\config\systemprofile\AppData\Local\Jenkins.jenkins\
+
+C:\Windows\System32\config\systemprofile\AppData\Local\Jenkins.jenkins\
+
+C:\Users\amitagrahari\AppData\Local\Jenkins.jenkins
+
+
+
+

@@ -1,0 +1,99 @@
+1 - NOde Js :
+
+V8 engine - written in C++
+Libraries - Written in C++
+
+Node js : written in Js
+
+2- Event Driven programming:
+
+3- Blocking and Non Blocking I/O :
+
+4 - Node Js is popular just because it is too much fast(performance) apart from javaScript : Pros :
+	LightWeight
+	Client and Server code is same (JavaScript code).
+
+5 - We remove thread concept in Node Js with the help of event driven programming.
+
+6 - Event Loop - It is a suite which can pool events, It is running in multithreaed environment.
+
+7 - Node Js is single threaded, But it is half truth,actually it is event driven and single-threaded with background workers.
+
+8 - Libuv - It is library that provides the event loop in Node Js.
+
+9 - V8 + NodeApi + Libuv = Node.js
+
+10 - Node Js cons : 
+		When we are processing CPU intensive Task - like image processing
+		Intelligence - LIke we will not get error on development time or something while dev like JavaScript issue.
+		Using Relational Database with Node.js is pain.
+		Every time using a callback end up with tons of nested callbacks.
+		
+11 - Node Js - Primitive types
+	String
+	Number
+	Boolean
+	Undefined
+	Null
+	
+	Support loose couple in var
+	
+12 -RAPL mode : for cmd in Node , Just write NODE and this will work
+
+13- process.argv
+
+14 - Callback
+15 - CallBack Hell
+16 - Promise
+
+17 - Local Modules
+
+18 - We have two types of dependency in pcakage.json , like dev and prod ?
+19 - Can we download only one dependency at a time ?
+
+20 - Module Pattern - It is working on caching pattern so it can import modules and put it in caching,So it can not download modules every time,
+ We can close it manually.
+ 
+21- Events and Events Emitters
+	Create Events - eventEmitter.on()
+	Run Events - eventEmitter.emit()
+	Remove Events - eventEmitter.removeListner()
+	
+22 - Express : 
+	22.1 - It is a framework to create minimal and flexible Node.js web application Framework.
+			It supports multiple templating engine like jade, handlebar, ejs
+			install - npm install -g express-generator
+			create app - express --git --view -ejs newexpressapp
+	
+	22.2 - Middleware - to route our request in specify path
+	22.3 - Handler - on the basis of redirection code is running (It is where we write our business logic)
+	22-4 - View Engines - express also provides view engine like ejs and all.
+	
+
+23 - Web Sockets : 
+24 - Socket.IO : Broadcast - No broadcast to same person who want's to broadcast
+		socket.on - create function
+		io.sockets.emit - listen the events
+		
+25 - launch.json - For Debugging we need to use launch.json
+
+26 - Streams
+27 - FileHandling
+28 - Authentication and Authorization
+29 - Session 
+30 - Interaction With Db
+
+
+
+
+
+
+
+
+
+
+#####Single threaded event loop modal?
+#####Same singelton pattern in multiple server,then how it will react?
+#####Node Js pros and cons
+
+

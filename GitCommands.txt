@@ -1,0 +1,7 @@
+1 - git init - initialize git on particular directory
+2 - git remote add origin [gitLink] - add origin link provided by git - Https
+3 - git remote -v - which process is allowed , fetch and push mostly
+4 - git add . - (Dot) indiactes all files needs to be add for commit
+5 - git commit -m "<Comments>" - Here we commit our code to git server.
+6 - git push origin master - Here we push commit code to server,without it code will not push to server.
+

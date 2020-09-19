@@ -1,0 +1,158 @@
+I. Install KubeCtl:
+        A. Download kubectl from link: https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/windows/amd64/kubectl.exe
+        B. Extract and put directory path in "PATH" enviornment varibles.
+        C. Test to ensure the version of "kubectl" is the same as downloaded: kubectl version --client
+
+II. Install Minikube: Make sure you have kubectl installed. 
+        Hypervisor must be enabled on window: https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/quick-start/enable-hyper-v
+        
+        A. Download "minikube-installer.exe" from :https://github.com/kubernetes/minikube/releases/latest/download/minikube-installer.exe
+        B. To confirm successful installation of both a hypervisor and Minikube, you can run the following command to start up a local Kubernetes cluster:
+                minikube start --driver=<driver_name>        [if docker desktop installed then no need of params]
+            minikube status
+                If your cluster is running, the output from minikube status should be similar to:
+
+ 
+
+                    host: Running
+                    kubelet: Running
+                    apiserver: Running
+                    kubeconfig: Configured
+                
+            minikube stop
+            minikube start
+            minikube delete
+            
+            minikube dashboard  [This will automatically launch the Dashboard in your local browser.]
+            minikube dashboard --url=true [URl only]
+            
+            minikube start --driver=docker
+            minikube start --vm-driver hyperv --hyperv-virtual-switch "Minikube Switch"
+			
+III. Install Helm - Make sure you have kubectl installation
+	A -Download "helm.exe" from https://github.com/kubernetes/helm/releases
+	B - Add folder to Path variable
+	C - To confirm successfully install , run helm on cmd.
+
+// Get Nodes
+kubectl get nodes
+
+// Get Nodes information widly
+kubectl get nodes -owide
+
+1-//create name space to run with same deployement:
+kubectl create ns <namespace name>      
+
+2-//Get All namespace
+
+kubectl get namespace  
+
+2-//Delpoy
+kubectl create deployment devops --image=hub.docker.com/repository/docker/amitagrahari2512/docker-test:23 -n <namespace name> 
+
+3-//Describe pod
+kubectl describe pod -n <namespace name>
+
+4-//Delete deployement
+kubectl delete deployment devops -n <namespace name>
+
+5-//Get Pod
+	kubectl get pod 
+
+	5.1-//Get pod in particular namespace
+	kubectl get pod -n <namespace name>
+	
+	5.2-//Describe Pod 
+	kubectl describe pod -n <namespace name>
+
+6-//Expose
+kubectl expose deployment devops --port 8081 --name devops1 --type NodePort -n <namespace name>
+
+kubectl expose deployment <deployment name> --port <where container run> --name <service name> --type NodePort -n <Namespace>
+kubectl expose deployment <deployment name> --port <where container run> --name <service name> --type NodePort <Node Port where we want run service> -n <Namespace>
+
+7-//Get cluster Info for IP
+kubectl cluster-info
+
+
+8-//Get Service Info
+	kubectl get service
+	kubectl get svc
+
+	8.1-//Get Service info with name space
+		kubectl get service -n <namespace name>
+		kubectl get svc -n <namespace name>
+
+
+10-//Get logs of partcular pods name
+kubectl logs devops-6c648f48f4-6695g -n <namespace name>
+
+11-//Get deployment
+	kubectl get deployment 
+
+	11.1-//Get deployment in namespace
+	kubectl get deployment -n <namespace name>
+	
+	11.1-//Get all deployment of all namespace  
+	kubectl get deployment -A
+
+12-//Scale a pod
+Kubectl scale deploy/<Name Of deployment> --replicas 2 -n <namespace name>
+
+13 - Delete service
+Kubectl delete service <serviceName> -n amitagrahari
+
+
+14- Declarative approach, we can use yaml file for doing deployment -We create, Update or anything we need to use this command
+
+kubectl apply -f <File_name> -n <namespace>
+
+15 - Get Api resources
+
+kubectl api-resources
+
+16 - Get Config
+
+kubectl config
+
+Helm : 
+
+1-//Create Helm Chart
+helm create buildachart
+
+2 - Create your devops chnages in deployment.yaml
+3 - values.yaml is using for define values
+
+4 - //Install Helm Chart
+
+helm install <helm-name> <chart-folder-name> --set nodeport=30130 -n <namespace name> 
+
+helm install devops-helm <chart-folder-name> --set nodeport=30130 -n <namespace name> 
+
+5 -//Uninstall Helm Chart
+
+helm uninstall <helm-name>
+
+6 -//Get helm List
+
+helm list -n amitagrahari
+
+7-//To deploy the application with the latest changes made to values.yaml, upgrade the application with the following command:
+
+helm upgrade <Helm Chart Name> <Chart-Folder-Name>
+
+
+Get Images on Kubernetes:
+
+1 - Get all image on all namespace
+
+kubectl get pods --all-namespaces -o=jsonpath="{..image}"
+
+2 - Get image on particular namespace
+
+kubectl get pods --namespace <Name space name> -o jsonpath="{..image}"
+
+
+Delete all data in namespace in Kubernetes:
+
+kubectl -n <NameSpaceName> delete pod,svc --all
