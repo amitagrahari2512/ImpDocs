@@ -1,0 +1,403 @@
+
+
+Open; https://aws.amazon.com/
+Click on "AWS management Console"
+
+1. create AWS account ie root account
+2. create IAM account from root
+3. save info of IAM account like ACCESS KEY-ID and secret Key:
+
+
+4. Always Login as IAM user.
+
+Session2: Identity and Access management:
+
+5. Install AWS CLI:
+	Follow steps from : https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
+	Download from : https://awscli.amazonaws.com/AWSCLIV2.msi
+	Run and install
+	Confirm on CMD with command: aws --version
+	
+	
+	configure profile for NAGP:
+	Run command on CMD: aws configure --profile <profile name>  
+	-->AWS Access Key ID [None]: <Enter IAM account access key>
+	-->AWS Secret Access Key [None]: <Eneter IAM account secret key>
+	-->Default region name [None]: <enter region ie ap-south-1>
+	-->Default output format [None]:<enter output format ie json>
+	
+	
+	Want to get s3 bucket/service (if exists):
+	aws s3 ls --profile nagp
+	
+	I. Create S3 Bucket by searching "S3" from Home page
+	
+	II. create with CLI: aws s3 mb  s3://nagpdemobucket --profile nagp
+	
+	III. After launch of new Instance, click on Connect from EC2 and connect from outside-world with the help of command example: ssh -i "nagp-session.pem" ubuntu@ec2-13-126-72-28.ap-south-1.compute.amazonaws.com and downloaded keyfile.
+		to connect from outside-world, 
+	IV. create SSH security group from EC2's Security Group menu. From Intances's Action menu, change security group and check SSh group also. then connect by SSh command from cmd
+	
+	V. Change permissions of Key-file to make it readonly to connect with resource from SSH:
+		You locate the file in Windows Explorer, right-click on it then select "Properties". Navigate to the "Security" tab and click "Advanced".
+
+		Change the owner to you, disable inheritance and delete all permissions. Then grant yourself "Full control" and save the permissions. Now SSH won't complain about file permission too open anymore.
+		
+		OR by using below commands:
+		$path = ".\test.pem"
+		# Reset to remove explicit permissions
+		icacls.exe $path /reset
+		# Give current user explicit read-permission
+		icacls.exe $path /GRANT:R "$($env:USERNAME):(R)"
+		# Disable inheritance and remove inherited permissions
+		icacls.exe $path /inheritance:r
+		
+	NOTE: always TERMINATE resource instead of STOP as we still reserves hard-drive with STOP.
+	
+	NOTE: To connect with SSH we need to add SSH Client and SSH Server feature from "Apps & Features"
+	
+	VI. create volume to increase volume of our resources and attach to existing resource. Can use snapshots while creating volume by providing snapshotId
+	VII. create window instance and get password by providing existing key file:
+		Public DNS	ec2-13-235-42-130.ap-south-1.compute.amazonaws.com
+		User name	Administrator
+		Password ts-kt@S!$sxn4@4SZkC8o9(kPO49?Z$Y
+		
+	VIII. can create images, snapshots form instances before TREMINATE so that we can use it anywhere else. Can create public or private snapshots to share them from "Snapshots" button. its stored in S3 and is chargable actually.
+	
+	can check pricing with its calculator: https://calculator.aws/#/
+	Example: estimate for EC2; proce will come down if we commit for long and for no change etc.
+	mainly pricing is being computed oon the basis of Storage and compute-power.
+	
+		We cannot change availability-zone one we select it in instance.
+		
+	IX. to handle scalling request we can define auto-scalling policy and launch policy which relies on Load-Balancer.
+Can define Launch configuration to scale-up ex on Sat, Sun fo e-commerce sites OR on CPU utilization: Ex: scale up if CPU remains 70% or more.
+
+X. Kubernates is good if we are creating multiple instance on same machine. But if we want more machine then go for AWS as AWS is good in  managing networking and other things.
+
+XI. (Can be created form IAM) From policy we can decide which access we want to give and for which instance etc. Ex. use existing policy's JSON for help and Effect, Action and Resource is main component in this. Resources can defined on which bucket we give which policy.
+If permission is given to user then we are going to use "Policies" and if we are going to give permissions to a service then we have to use "Roles"
+Developer, QA etc are groups and not roles, Roles are used to access services.
+
+So create policy with access to required resources (have to add key of resource, can be found from bucket etc) and then add policy to user.
+
+IAM has option to create "Groups". when we attach user to a group then user inherites the permssions
+
+XII. our instances run on shared machine. But we can have dedicated machines also so that our instance run on machine which is assgined to us only.
+
+
+Session3: Introduction to Storage:
+We get changed for storing data in buckets so can create many buckets which are not chargable.
+I. Object Storage-S3: It allow you to put data in big chunk (ex. backup). Durable, reliable and mainly used for Backups.restriction is 5TB.
+Eventual consistancy: when data is stored, for some time its not available.[because aws replicate data on multiple places]
+AWS bucket name is globaly unique.
+
+We can create multiple buckets and can create replication job to copy data from 1 bucket to another.
+Versoning is used to keep version of file to stop overriding of same file [But cost will go up as old file will also exist] 
+
+II. Block Storage-EBS: Volume is Block storage as its highly performant and use to with machine. It can be created with snapshot[which is Object storage].1 volume can be attached to 1 EC2 only. But a Machine can have multiple volums attached to it. It is expensive of all of 3.
+
+III. File Storage-EFS:  Ex: Shared Folder where software are kept and shared by many ie when there is requirement to store data on different instances simultansly. its created from EFS. We can mount this also. this is shared.
+S3 bucket and EFS gives option to create Access-Point. its 2nd expensive after block-storage. Faster then S3 but slower then EBS.	
+
+
+Extra:
+
+[
+Key management Service(KMS): Used to create encription key which will encript volume. Its  chargable as they store our key.
+
+AWS Snow Family & AWS snowball: when there is lot of data to transfer to S3 then we can make request for snowball and AWS shit us a machine which will be used to transfer our data and then sent back to AWS to upload to cloud.
+
+AWS S3 transfer Accelration: if data is less then AWS provide this service also.
+
+]
+
+
+Session4: Create/Modify Volume with Terraform script, Create/Modify instance with terraform script and use of security-group.
+
+Steps: I. Go to https://www.terraform.io/downloads.html
+II. Extract the file and put path in Env variable.
+III. Use "Visual Studio Code" to create and run terraform scripts:
+ commands: terraform init
+ terraform fmt
+ terraform apply -auto-approve
+ 
+ terraform plan
+ terraform destroy
+  
+
+Storage Classes:
+1. General Purpose SSD provides IOPS:300/3000 ie consistancy of 300 and can go for 3000 in burst mode.
+Catch is Intial balance provided is 5.4 million IOPS and 3 IOPS per GB per second are added for our instance.
+So in burst mode balance is deducted from this only. Min provided IOPS are 100 ie if we have 20GB volume then IOPS will be 100 instead of 300 and Max is 16000 after 5333GB ie for 16000GB IOPS will be 16000 IOPS.
+
+2. Provisioned IOPS SSD: If our requirement is IOPS then we can use it and can specify IOPS.
+
+If we remove default security group from instances then they cannot communicate with each other and there private IP cannot be accessed form outside (but can be from local machine as in VPC private IP is routed as local ip and can be accessed from same machine)
+
+Elastic Ips: are assigned to instances which even works if machine is destroyed or rebooted. Its chargable even if instance is deleted.
+So Elastic Ip is used with Load-balancer(we use NIC for this).
+
+
+Session5: Instance Family and change, VPC,Subnets, Route Tables, Internet gateway
+
+1. Instance Families: like: "General Purpose", Compute Optimized, GPU instances, Memory optimized,Storage optimized etc. these are designed for need of user.
+2. Spot Instances and On-demand: Used to reserve capacity for use at some time. you can request it from "Spot Request" menu. Its cheaper then On-demand instances. But AWS can take it away if need arises.
+Use: conside amazon has 100 hits so load-balancer manages it correctly. Now requests are 1000 so we can have on-Demand and Spot-Instances to increase the instances to manage requests and to save money. With Spot-Instances we scaling	 instances and not load-balancer.
+
+3. Image: if we want to use same setting of 1 instance for others then we can create image and then can use it. When we create a image then 1st snapshot is created and then from that image is created.
+So if we want to delete a snapshot then we will get an error as snapshot is being used by AMI. so 1st we have to deregister snapshot from AMI and then we can delete that snapshot. So if AMI is deleted then our Instances will not be impacted.
+We cannot use AMI in different regions. but we can move snapshots in different regions and can use them.
+
+4. Networking: In AWS it always follows tree-structure.
+We cannot assign same IP address to different subnet. AWS also does not allow it. 
+Subset is bound to different availability-zone or data-center.
+
+5. VPC: create using "VPC" service. VPC are region level resources and max 1 is allowed per region. 1 region VPC is not available in another region.
+AWS provide 1 VPC by default.
+
+Subnets: we cannot create any instance/resource with created VPC because we are not mapped to a phsical entity ie Data-center. For this we have to create Subnets.
+So create subnet from "Subnet" button in VPC service. here AWS also provides default subnets which are mapped to default VPC.
+Now IP value in "IPv4 CIDR block" should be child of "VPC CIDRs" as subnet is under VPC.
+
+Then after creating multiple/single subnet we can use VPC and subnet while creating New Instance.
+
+here Security-groups, configurations are also VPC specific. so if we want to add a security group in instance created with new VPC then we should create a security-group for this VPC.
+
+Key-pair is region specific and not VPC.
+
+So PrivateIP address of instance are from our Subnet but not public.
+
+Route table: Even after adding SSh security group, we cannot connect to instance as there is no "route-table entry" and "Internet gateway" for these private ips of instance in VPC.
+So gateway works like a cop and route-table entry need to connect with subnets.
+We can add "Route" from Edit route for "Internet gateway" etc
+Then we have to associate subnet from "Subnet Association"
+
+Public subnet: if "Internet gateway" to communicate with outer world is defined and associated with route.
+
+TODO (Done):
+
+Activity: create a instance and then image from this. then use ami from "My AMI" to create instance by terraform. 
+Activity: create VPC with IP: 10.0.0.0/16
+Use CIDR to IP range site for IP calculation
+using subnets:
+1. MyPublicSubnet:10.0.0.0/24, ap-south-1a
+2. MyPrivateSubnet:10.0.1.0/24,auto
+3. Create Ec2 instance with public subnet: create security-group to access 22 port for this VPC and attach to Ec2
+4. try to connect with SSH,
+5. as unable to connect so, create a Internet Gateway: MyDemo-IG, Now attach this IG to VPC
+6. create a RouteTable:web-public-RT, 
+EditRoute and add target as "Internet Gateway" for IP: 0.0.0.0/0
+and associate public subnet to it
+Now Connection is success.
+
+
+Same 
+
+1. Create Ec2 instance with private subnet, attach security groups and ping its private IP from window of connected public instance.
+2. try to connect with SSH,
+5. as unable to connect so, create a Internet Gateway: MyDemo-IG, Now attach this IG to VPC
+6. create a RouteTable:web-public-RT, 
+EditRoute and add target as "Internet Gateway" for IP: 0.0.0.0/0
+and associate public subnet to it
+Now Connection is success.
+
+
+Public and private communication depends on if we have RT which allows communication with outside and if subnets are associated with it.
+
+
+
+
+ 
+Session 6: VPC: create VPC/subnets/internet gatways etc with terraform. launch instances with public and private subnet communication.
+
+VPC can be extended to 1 or multiple instances.
+
+1. Nat Gatways: If we want to communicate with outer world from private-subnet but do not want communication from outer world then we use Nat-Gatways.
+We have to put this in public-gatways as it has access to outer world. This is like proxy  in public  subnet for private-subnet and outer world.
+It is not specific to VPC but to specific subnet.
+
+
+2. Nat-Server: its same like Nat-Gatways. But in case of Nat-Gatways, all reponsiblity of instance management lies with AWS. But in case of Nat-Server we have to manage all things. So its recommended to use Nat-Gatways instead of Nat-Server.
+
+We can have 2 route tables, 1 associated to router to communicate with outer world (ie like web-service) and other associated with router to expose resources to internal network only (ie like DB).
+
+Use jumpbox to login to machine with private IP: search ssh agent forwading
+commands: 
+I. in key folder: ssh-add -K <key-name>
+II. pick last portion of connect SSH command from public instance and run: SSH  -A <last portion with IP>
+III. then pickup private IP of private instance and run SSH <private IP of private instance>
+
+Now curl www.google.com will not work as outside communication not allowed.
+
+So here we can define and use Nat-Gatways
+IV. After creating Nat-Gatways with public subnet and assign elastic-IP, Associate with private-route. So add Ip route entry with communication through Nat-Gatways.
+
+V. Now again connect with Jumpbox and curl google. it will works.
+
+
+3. Peering Connections: This is used to communicate with difffernt region VPC.
+For example: 2 regions have VPC and we have internal data-server on which i want that 2nd region VPC can also have access. Like VPN.
+
+
+TODO:
+
+Activity:create vpc in us region, change cdir ips with terraform for US region same like activity of AP  region. Have to create new key-pair for Us region
+Then connect to it then try to ping internal IP of instance of AP region VPC. it wont work.
+
+Now in AP security-group add inbound rule of "All-ICMP IPv4" also. Same in US region also.
+Then try ping from US to AP by public IP. it will work. But private will still not works.
+
+Now create peering connection to peer AP VPC to US VPC. have to give VPC id from other region vpc.
+Then request will be sent to US Peering Connection for acceptance. Accept but we are not ready to connect.
+Now we have to modify our Route table in US. So we have to change settings of public route and have to add new route.
+Give IP of AP VPC route and connection as Peering-connection.
+Same we have to do with route table of AP.
+
+Now we can ping private IP of 1 VPC from another.
+
+So same we can do with private Routes and there instances.
+
+
+4. Network Interfaces (NIC): by default 1 is created for every instance. We can create our own for subnets and assign them security-group.
+Then it will be visible to select if we are going to use subnet in instance creation.
+
+
+TODO:
+Activity: Create VPC, public/private subnets,secirity-groups associate with 2 instances by terraform.
+Activity: then use Nat-Gateways to communicate with outer world from private instance.
+
+
+Activity: Similarly Create VPC, public/private subnets,secirity-groups associate with 2 instances in US region
+Activity: then use Nat-Gateways to communicate with outer world from private instance. then Peering-connection to communicate with other region VPC instance.
+
+
+
+
+Session7: 
+
+RDS: AWS managed DB. We can create Db from this or can restore from S3.
+
+Practice: 1. Create a MySql 8 Db with Free tier. By Default "Public accesability" will be no. We can make it Yes while creating DB.
+We monitor DB from "Cloud Watch" from Monitorng tab.
+Without an Instance, created Db will not be shown in EC2.
+Using "End-Point" and "Proxies" we can get access to DB from outside.
+We can add security group in Db also.
+DB backup is taken care by AWS. Duration is from 7 to 35 days. Backup are incremental, ie full backup is taken 1st time and then its incremental. so if middle 1 is deleted then higher has all the data.
+
+TODO:
+Connect to Db:
+1.. Created Db should have "Public connectivity" setting as "Yes"
+2. create security group for "MySql" and expose its IP Port 
+3. Modify Db and attach security group to it.
+4. We willl connect from "MySql Workbench"'s "Manage Server Connections"
+
+
+Can take snapshots and restore from it also.
+
+Activity: 
+1. Read about cap theorem
+2. No Sql Db adds for you, limitaions and advantages
+3. NAT Gatways
+we can have public instance by 2 ways:
+i. private instance with public Ip disabled which will be comunicate with NAT gatways in 2 ways to outsde world (By default AWS allow 1 way communiation on NAT gatways)
+2. public instance with public IP.
+
+
+
+Session8:Aurura DB, Amazon Keyspace, Amazon DynamoDB
+
+
+Session9: Amazon SQS,Amazon MQ, Amazon SNS, Working,characterstics of lamda, notifications
+
+Amazon SQS: its pull based, ie there must be a consumer to pull the message else message will remains in Queue.
+Types:
+1. FIFO: while creating this queue, need to add .fifo in last of name as per rule. there is no infinite scalability. ie throughput is like 3000
+2. Standard Queue:
+
+TODO:
+Create a queue with terraform, send message from SQS's "Send and recieve messages"
+
+
+Amazon MQ : 
+
+Amazon SNS(Simple Notification Service): used to sent messages/notifications Its also Chargable.
+
+to create Fan OUT have to use SNS with SQS ie Message will sent from SNS to SQS and then will be sent to multiple consumers.
+
+TODO: 1. create a SNS topic and subscribe with email and publish message. check email
+2. Create a SNS topic. Create a queue,subscribe to SNS service.  subscrib SNS with email and SQS queue. Publish a message. check message in gmail.
+Then check if message is available in queue to process further.
+
+Cloud Watch: used to create alarms. Its Chargable
+
+TODO: 1 . create rule for EC2 for EC2 state change notification. and target as SNS topic.
+
+
+
+Session10:Working,characterstics of lamda, Auto-Scaling Group
+
+Auto-Scaling Group: amazon serevice which can be used to auto-scale of EC2 instances. for this we have to tell about instance template which will be created and have to define conditions like: CPU usage>70% for last 5-10 min.
+In this atleast 2 EC2 instances are maintaned for auto-scaling. so even if 1 instance is terminated for some reason then amazon will pick template and will create EC2 instance to maintane 2 instances.
+
+So if we want to scale a machine with code then we have to define our own AMI and then we will select this AMI in template so when auto-scaling is performed then code will be deployed automatically.
+
+
+so for auto scaling;
+1. we ssh to ec2, 
+2. run sudo apt-get update to update machine
+3. install apache: sudo apt install apache2
+4. then have to open port 80 also by adding inbound rule in security group fo type "HTTP" 
+inbound rules are statefull. ie if we open inbound for port 80 then outbound will also be opened automatically.
+5. then use public ip of ec2 from browser to access apache
+6. then create image of ec2 instance from actions. then in AMI, 1 new AMI will be created. so this AMi will be used for auto-scaling.
+
+
+So if we created image after code-deployement then code will be deployed automatically.
+We can deploy code with post scripts also.
+Also we can run script command while creating instance from option: "User Data"
+
+7. then create another ec2 instance by using this AMI so in this instance apache is already installed and can access it directly.
+
+
+Lamda: we can create lanbda function in any laguage by selecting from dropdown.
+also have to use Permissions
+then we will have screen  to add code
+will have to select Trigger: trigger can be used like alert when file is uploaded in S3 bucket
+Ex: select trigger as S3
+then select bucket
+then select EventType like PUT COPY POST 
+
+now use Test Event to pick event and test after creating test-event.
+
+then add target: we can add SNS target
+
+Cloud Trail: used to keep check who is using what ie to make compliance policies.
+Cloud Watch: used to keep track of logs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+
+
+	
+	
+	
+
+
+

@@ -1,0 +1,143 @@
+AWS :
+
+--Login with CLI :
+
+aws configure --profile nagp
+Enter Access Id
+Enter Secret Access Key
+Enter region
+
+--Get S3 bucket list:
+
+aws s3 ls
+
+if you have multiple profile so we need to use --profile <ProfileName>
+
+aws s3 ls --profile nagp
+
+--create s3 bucket from CLI
+
+
+aws s3 mb s3://amittestaws
+
+aws s3 mb s3://amittestaws --region ap-south-1
+
+aws s3 mb s3://amittestaws --profile nagp
+
+---Roles
+
+For service to service communication 
+
+---Policies
+
+For particualar resource we can create own policy
+
+
+---storage categories:
+
+1 - Object Storage - (S3) - (--work on http protocol)
+2 - File Storage - (EFS) - ex: software directory  (-- Work on other protocol)
+3 - Block Storage - (EBS) - (Volume) - ex: hard drive associate with system 
+
+---Create Volume
+
+it is block storage
+
+
+---Terra Form:
+
+1- terraform init
+2- terraform plan - Tell What this terra form can do
+3- terraform apply -auto-approve
+4- terraform destroy
+
+5- terrafprm fmt fileNmae.tf 
+
+NOTE - .tfstate file conains output for micro services returned
+
+---VPC
+
+172.31.0.0/16
+
+Ip range has - 32 bits = 16 means we are fixing 16 bits and rest 16 bit we can use
+so 2 pow 16  = 65536 , So we have
+2 pow 36 -1 Ip range = 65536-1 = 65535
+
+
+--- Create VPC Process
+
+1 - Create Vpc
+2 - Create Internet Gateway
+3 - create Route Table
+4 - Create Subnet
+5 - Associate Subnet to Route Table	
+
+6 - NatGateway - When private subnet ,want to communicate with outside world, then we need to create nat gateway for this,
+	After Nat Gateway private subnet can communicate with outside world, but outside world cannot connect with private subnet,
+	This is the beauty of NAT Gateway.
+
+7 - peer vpc communication - when two different region vpc wants to connect, then use Peer communication,nd change route table accordingly.
+	Two VPC can have same cidr range,
+	But when we do peer vpc communication, then cidr range should be diffrent.
+
+
+
+---
+
+Max 5-VPC in One Region(1 - default , 4 - more we can create)
+
+For VPC we need to create a Subnet 
+
+Security Group is associated with Vpc
+
+Vpc needsds to connect with internet gateway
+
+1 Internet gateway attached with atmost one VPC
+
+
+--- Can 2 VPC connect through Private IP?
+
+Yes It can but we need to use VPC Pering concept, 
+
+Or else we need to use internet gatway for communication
+
+
+---- Routes
+
+Without routes VPC is not working, because we haven't describe which is working on internet gateway
+Routes have  2 entity:
+
+1 - VPC IPs - it is showing that those IPs are local ip and this can be communicated without internet gateway.
+
+2 - 0.0.0.0/0 - It is showing any IP from this range apart from (VPC IPs )from outside word can be go through with in Internet gateway.
+
+3 - Subnet must be associate with Internet gateway
+
+-----------------------------------------IMP---------------------------------------
+
+AWS CLI
+---TERA FORM
+---TERA FORM Registry - registry.terraform.in
+
+Elasticity
+
+Capex vs Opex
+Capital Expense
+Operational Expense
+
+SDN - Software Defined networks
+
+OSI - 
+
+Infrastructure.aws
+calculator.aws
+
+AWS SnowBall
+Amazon S3 Transfer
+Aws Storage Gateway
+
+S3 Lifecycle
+EC2 LifeCycle
+
+JUMP Box
+

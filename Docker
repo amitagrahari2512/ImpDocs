@@ -1,0 +1,373 @@
+1 - Pull file : 
+
+docker pull <Image_name>
+
+docker pull redis
+
+2 - Get System info :
+
+docker system info
+
+3 - Get Docker Image list :
+
+docker image ls
+
+4 - Get Docker Image list with hash :
+
+docker image ls --digests
+
+5 - Get Docker image inspect
+
+docker image inspect <image_name> <Image_id>
+
+docker image inspect redis 1123344
+
+6 - History of Image
+
+docker image history <Image_Name>
+
+docker image history redis
+
+7 - Remove of image
+
+docker image rm <Image_Name>
+
+docker image rm redis
+
+8 - Registry/Repo:Image(Tag)
+	
+	docker.io/redis:latest
+	docker.io/nginx:1.13.5
+	docker.io(default)/<repo>:latest(default)
+	
+9 - Content Hashes : SHA256:12222222222222222222222222222222222222222222
+
+10 - Image config : It is a manifest which defines the layer
+
+12 - When we push the layer to registry,
+
+		we compress Content Hash and Image Config(Manifest) :
+
+		So it is called Distribution Hashes and its stored in registry
+	
+	
+13 - https://docs.docker.com/docker-hub/official_images/
+
+14 - Build Docker Image with Dockerfile - Name always be Dockerfile
+
+docker image build -[tag : tagName] [folder where Dockerfile put (For current folder . else folder path)]
+
+docker image build -t psweb .
+
+15 - Run image on Docker Container
+
+docker container run -d --name (Name) -p (Host Port) : (Container Port) Image_Dockerfile_Name
+
+docker container run -d --name web1 -p 8080:8080 psweb
+
+Now Run It is on local : localhost:8080
+
+16 - Check How many container running : 
+
+docker container ls
+
+17 - Docker Container run : 
+
+docker container run -d <Image_Name> <Command>
+
+docker container run -d alpine sleep 1d
+docker container run -d alpine sh
+
+18 - Stop container
+
+docker container stop <containerId-Starting-Two-Digit>
+
+docker container stop 60
+
+19 - Start Container
+
+docker container start <containerId-Starting-Two-Digit>
+
+docker container start 60
+
+
+20 - Default process for new containers
+
+CMD : Run-Time arguments override CMD instructions
+
+ENTRYPOINT: Run-Time arguments are appended to ENTRYPOINT
+
+
+21 - Get Port
+
+docker port <name>
+
+docker container run -d --name web1 -p 8080:8080 microsoft/iis
+
+docker port web1
+
+22 - Get Ip address of container
+
+docker inspect -f "{{ .NetworkSettings.Networks.nat.IPAddress }}" <name>
+
+docker container run -d --name web1 -p 8080:8080 microsoft/iis
+
+docker inspect -f "{{ .NetworkSettings.Networks.nat.IPAddress }}" web1
+
+
+23 - Remove all container
+
+docker container rm $(docker container ls -aq) -f
+
+docker container ls -aq = get All list of container
+-f = force first stop container and then remove
+
+--- Remove or stop containe by name
+
+docker container stop "Name"
+docker containe rm "Name"
+
+24 - Logging - 
+	
+	1 - Engine/daemon :
+			Linux : 
+				- systemd:
+					journalctl -u docker.service
+				
+				-Non-Systemd
+					Try /var/log/messages
+					
+			Windows : 
+				~/AppData/Local/Docker
+				
+	2 - Containe/App : 
+			1 - STDOUT
+			2 - STDERR
+			
+			we can us existing logging solution : 
+				Syslog, Gelf, Splunk, Fluentd
+				
+			
+		SET default logging driver in daemon.json
+		
+		Override per-container with
+			--log-driver --log-opts
+			
+		Inspect logs with docker logs <container>
+			-Doesn't work with all drivers
+			
+25 - Swarm : has 2 parts.
+		1 - Secure Cluster
+		2 - Orchestrator
+
+26 - Create Swarm - 
+
+docker swarm init --advertise-addr <SystemIp>:2377
+
+docker swarm init --advertise-addr 192.168.0.4:2377
+
+27 - Check Nodes
+
+docker node ls
+
+28 - Join Managers :
+
+docker swarm join-token manager
+
+This command gives a token line - We need to copy that line and, paste in another node.
+
+ docker swarm join --token SWMTKN-1-530saqgxjimkn51oxzd3rm6rz3gx9hgd87a33lx5f7feyoh4ci-3ibpvze6oom0xigb3bj0029p1 192.168.0.4:2377
+
+29 - Join Workers:
+
+docker swarm join-token worker
+
+This command gives a token line - We need to copy that line and, paste in another node.
+
+****************We can use linus as well as windows nodes for Manager and Worker nodes.
+Just copy paste token and run.
+docker swarm join --token SWMTKN-1-530saqgxjimkn51oxzd3rm6rz3gx9hgd87a33lx5f7feyoh4ci-9iiwswa1iy9nuhw13uuv2f8ig 192.168.0.4:2377
+
+30 - Lock your swarm with AutoLock - 
+	* Prevets restarted Managers from Automatically re-joinging the Swarm
+	* Prevets accidentally restoring old copies of the Swarm
+	
+	Autolock New Swarm : 
+	
+	docker swarm init --autolock
+	
+	Autolock existing Swarm
+	
+	docker swarm update --autolock=true
+	
+	This gives a one secret Ids ----- we need to save this id
+	
+	And when we use
+	
+	docker swarm unlock ==== Here we need to pass this secret key id
+	
+31 - We can set Swarm expiry - 
+
+docker swarm update --cert-expiry 48h
+
+32 - Networking
+
+	1 - Bridge
+	2 - Overlay
+	3 - MACVLAN
+	
+33 - Check Network - 
+
+docker Network ls
+
+34- Inspect network
+
+docker network inspect <Name>
+
+35 - Create network
+
+Docker-Network-Name = Bridge, Overlay, MACVLAN
+
+docker network create -d <Docker - Network-Name> <Name>
+
+docker network create -d Bridge golden-gate
+
+36 - Run Containe on network
+
+docker container run -d --network <Network Name> <Image_Name> <Command>
+
+docker container run -d --network golden-gate alpine sleep 1d
+
+37 - get Service list
+
+docker service ls
+
+38 - same network to multiple service
+
+docker service create -d --name <service name> --replicas <Replica-No> --network <Network-Name> <ImageName>
+
+docker service create -d --name pinger --replicas 2 --network overnet alpine sleep 1d
+
+39 - Get Service info
+
+docker service ps <Service-Name>
+
+docker service ps pinger
+
+39.1 -  Docker Service inspect
+
+docker service inspect secret-service
+
+
+40 - Create Volume
+
+docker volume create <volume-Name>
+
+docker volumne create v1
+
+41 - List of volumnes
+
+docker volume ls
+
+42 - Delete volume
+
+docker volume rm <Volume name or List of volumne name with space>
+
+docker volume rm v1
+
+
+43 - Inspect volume
+
+docker volumne inspect <Volume-Name>
+
+docker volume inspect v1
+
+44 - Attached volume to container
+
+docker container run -dit --name voltest --mount source=ubervol, target=/vol alpine:latest
+
+if volume present then use current volume else it will create that volume automatically
+
+45 - Docker Secrets : 
+
+Its is a file which contains a secret of keys .
+It is string <=500k
+Safe
+Secure
+Infrastructure Independent
+Requires Swarm-mode
+
+46 - Create Secrets
+
+docker secret create <Secret-name> <File Name with Path>
+
+docker secret create wp-sec-v1 .\classified
+
+47 - List of Secrets
+
+docker secret ls
+
+48 - Secret inspect
+
+docker secret inspect <Secret_Name>
+
+docker secret inspect wp-sec-v1
+
+49 - Use Secret Key in service
+
+docker service create -d --name secret-service `
+>> --secret wp-sec-v1 `
+>> microsoft/powershell:windowsservercore `
+>> PowerShell Start-Sleep -s 86400
+
+
+50 - Docker Stack
+
+docker stack deploy -c <FileName.yaml> <Stack-Name>
+
+docker stack -c deploy stackfile.yaml voter
+
+51 - List of slack
+
+docker stack ls
+
+52 - Stack info by Stack-Name
+
+docker stack ps <Stack-Name>
+
+docker stack ps voter
+
+53 - Get docker stack services
+
+docker stack services <Stack-Name>
+
+docker stack services voter
+
+54 - Docker Scale service
+
+docker service scale <Service_Name> = <Scaling_Number>
+
+docker service scale voter_service = 20
+
+Now 20 Replicas run
+
+
+---------------------Docker EE -- Paid Tool  - UI for everything
+
+55 - Docker universal code plane (UCP)
+
+
+56 - Docker Trusted Registries (DTR)
+
+57 - Role Based Access control (RBAC)
+
+58 - Image Scanning
+
+59 - Load Balancing
+
+
+
+
+
+
+
